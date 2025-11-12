@@ -82,7 +82,7 @@ uvicorn main:app --reload --port 8000
 3. **Customize Experience**
    - Toggle dark mode with the 🌙 button (top right)
    - Adjust playback speed (0.5x - 2x) for language learning
-   - Use keyboard shortcuts for efficient control
+   - Use keyboard shortcuts for efficient control ([Full Guide](KEYBOARD_SHORTCUTS.md))
 
 4. **View Content**
    - Subtitles display below the audio player

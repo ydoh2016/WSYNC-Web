@@ -88,17 +88,30 @@ class AudioSubtitleViewer {
      * Initialize keyboard shortcuts
      */
     initializeKeyboardShortcuts() {
-        document.addEventListener('keydown', (e) => {
+        // Use window instead of document to catch all keyboard events
+        window.addEventListener('keydown', (e) => {
             // Only handle shortcuts when player is visible and audio is loaded
             if (this.playerSection.style.display === 'none') return;
             if (!this.audioPlayer.src) return;
             
-            // Don't handle shortcuts when typing in input fields
-            if (e.target.tagName === 'INPUT' || 
-                e.target.tagName === 'TEXTAREA' || 
-                e.target.tagName === 'SELECT') return;
+            // Don't handle shortcuts when typing in text input fields
+            // But allow shortcuts when audio player or buttons have focus
+            const activeElement = document.activeElement;
+            const isTextInput = activeElement && (
+                (activeElement.tagName === 'INPUT' && 
+                 (activeElement.type === 'text' || 
+                  activeElement.type === 'email' || 
+                  activeElement.type === 'password' || 
+                  activeElement.type === 'search' || 
+                  activeElement.type === 'tel' || 
+                  activeElement.type === 'url')) ||
+                activeElement.tagName === 'TEXTAREA'
+            );
+            
+            if (isTextInput) return;
             
             // Don't handle if any modifier key is pressed (Ctrl, Alt, Cmd)
+            // Except for Shift (needed for some shortcuts)
             if (e.ctrlKey || e.altKey || e.metaKey) return;
             
             let handled = false;
@@ -107,38 +120,45 @@ class AudioSubtitleViewer {
                 case ' ':
                 case 'Spacebar':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.togglePlayPause();
                     handled = true;
                     break;
                 case 'ArrowLeft':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.skipBackward();
                     handled = true;
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.skipForward();
                     handled = true;
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.increaseVolume();
                     handled = true;
                     break;
                 case 'ArrowDown':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.decreaseVolume();
                     handled = true;
                     break;
                 case 'm':
                 case 'M':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.toggleMute();
                     handled = true;
                     break;
                 case 'f':
                 case 'F':
                     e.preventDefault();
+                    e.stopPropagation();
                     this.toggleFullscreen();
                     handled = true;
                     break;
@@ -148,15 +168,44 @@ class AudioSubtitleViewer {
                 // Visual feedback
                 this.showKeyboardFeedback(e.key);
             }
-        });
+        }, true); // Use capture phase to catch events before they reach other elements
     }
     
     /**
      * Show visual feedback for keyboard shortcuts
      */
     showKeyboardFeedback(key) {
-        // Optional: Add visual feedback when keyboard shortcuts are used
-        // This helps users know their input was registered
+        // Create feedback element if it doesn't exist
+        let feedback = document.getElementById('keyboardFeedback');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.id = 'keyboardFeedback';
+            feedback.className = 'keyboard-feedback';
+            document.body.appendChild(feedback);
+        }
+        
+        // Map keys to readable names
+        const keyNames = {
+            ' ': 'Space',
+            'Spacebar': 'Space',
+            'ArrowLeft': '← 5s',
+            'ArrowRight': '→ 5s',
+            'ArrowUp': '↑ Volume',
+            'ArrowDown': '↓ Volume',
+            'm': 'Mute',
+            'M': 'Mute',
+            'f': 'Fullscreen',
+            'F': 'Fullscreen'
+        };
+        
+        const displayName = keyNames[key] || key;
+        feedback.textContent = displayName;
+        feedback.classList.add('show');
+        
+        // Remove after animation
+        setTimeout(() => {
+            feedback.classList.remove('show');
+        }, 800);
     }
     
     /**
@@ -396,6 +445,16 @@ class AudioSubtitleViewer {
             
             // Scroll to player section
             this.playerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Remove focus from any element to enable keyboard shortcuts
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+            
+            // Show hint about keyboard shortcuts
+            setTimeout(() => {
+                this.showStatus('info', '💡 Tip: 키보드 단축키를 사용해보세요! (Space, ←, →, ↑, ↓, M, F)');
+            }, 1000);
             
         } catch (error) {
             // Display detailed error message

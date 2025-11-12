@@ -308,6 +308,11 @@ body.dark-mode h1 {
     outline: none;
 }
 
+/* Prevent audio player from stealing focus */
+#audioPlayer:focus {
+    outline: none;
+}
+
 /* Speed Control */
 .speed-control {
     margin-top: 15px;
@@ -617,6 +622,34 @@ body.dark-mode h1 {
 
 .attribution-notice a:hover {
     text-decoration: underline;
+}
+
+/* Keyboard Feedback */
+.keyboard-feedback {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(102, 126, 234, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.keyboard-feedback.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+body.dark-mode .keyboard-feedback {
+    background: rgba(139, 158, 255, 0.95);
 }
 
 /* Dark mode specific adjustments */
