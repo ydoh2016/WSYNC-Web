@@ -1,5 +1,6 @@
 """
-FastAPI backend for Audio Subtitle Viewer.
+W Sync - WAV Audio & Subtitle Synchronizer
+FastAPI backend for synchronizing audio with subtitles.
 
 Copyright (C) 2024 [Your Name]
 
@@ -36,8 +37,8 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Audio Subtitle Viewer",
-    description="Web application for synchronizing audio files with VTT subtitles",
+    title="W Sync",
+    description="WAV Audio & Subtitle Synchronizer - Sync audio files with VTT subtitles",
     version="1.0.0"
 )
 

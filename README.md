@@ -1,6 +1,14 @@
-# Audio Subtitle Viewer
+# 🎵 W Sync
 
-A web application for synchronizing and playing WAV audio files with VTT subtitle files. Optionally display images alongside subtitles.
+**WAV Audio & Subtitle Synchronizer**
+
+> Sync your audio with subtitles in perfect harmony 🎵
+
+A powerful, lightweight web application for synchronizing and playing WAV audio files with VTT subtitle files. Perfect for language learning, transcription work, and audio content creation.
+
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 
 ## Features
 
@@ -23,6 +31,10 @@ A web application for synchronizing and playing WAV audio files with VTT subtitl
 - **⚡ Playback Speed Control** - Adjust speed from 0.5x to 2x (perfect for language learning!)
 - **💬 Feedback Button** - Send feedback directly to the developer
 - **🎯 Modern UI** - Beautiful gradient design with smooth transitions
+
+## 🎬 Demo
+
+Try it live: [Coming Soon]
 
 ## Quick Start
 
@@ -89,6 +101,15 @@ Environment variables:
 | `UPLOAD_TIMEOUT` | Upload timeout in seconds | `300` (5 minutes) |
 | `ENVIRONMENT` | Environment mode | `production` |
 | `PORT` | Port to run on | `8000` |
+
+## Why W Sync?
+
+- 🎯 **Simple & Focused** - Does one thing and does it well
+- 🚀 **Fast & Lightweight** - No heavy frameworks, pure performance
+- 🌐 **Works Everywhere** - Just a web browser needed
+- 🎓 **Perfect for Learning** - Ideal for language learners and students
+- 🔒 **Privacy First** - All processing happens on your server
+- 💰 **Free & Open Source** - AGPL-3.0 licensed
 
 ## Technology Stack
 

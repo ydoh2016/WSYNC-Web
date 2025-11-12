@@ -1,6 +1,6 @@
-# Deployment Guide
+# W Sync - Deployment Guide
 
-This guide provides instructions for deploying the Audio Subtitle Viewer application to various platforms.
+This guide provides instructions for deploying W Sync (WAV Audio & Subtitle Synchronizer) to various platforms.
 
 ## Table of Contents
 

@@ -1,5 +1,5 @@
 /**
- * Audio Subtitle Viewer Application
+ * W Sync - WAV Audio & Subtitle Synchronizer
  * Handles audio playback with synchronized subtitle display
  */
 
@@ -566,5 +566,5 @@ class AudioSubtitleViewer {
 // Initialize application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const app = new AudioSubtitleViewer();
-    console.log('Audio Subtitle Viewer initialized');
+    console.log('W Sync initialized');
 });

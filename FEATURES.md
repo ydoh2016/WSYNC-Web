@@ -1,6 +1,6 @@
-# New Features Guide
+# W Sync - New Features Guide
 
-This document describes the newly added features to the Audio Subtitle Viewer.
+This document describes the newly added features to W Sync (WAV Audio & Subtitle Synchronizer).
 
 ## 1. Favicon 🎨
 
