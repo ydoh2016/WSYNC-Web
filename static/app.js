@@ -94,9 +94,14 @@ class AudioSubtitleViewer {
             if (this.playerSection.style.display === 'none') return;
             if (!this.audioPlayer.src) return;
             
-            // Don't handle shortcuts when typing in text input fields
-            // But allow shortcuts when audio player or buttons have focus
+            // If audio player has focus, remove it immediately
             const activeElement = document.activeElement;
+            if (activeElement === this.audioPlayer) {
+                this.audioPlayer.blur();
+                document.body.focus();
+            }
+            
+            // Don't handle shortcuts when typing in text input fields
             const isTextInput = activeElement && (
                 (activeElement.tagName === 'INPUT' && 
                  (activeElement.type === 'text' || 
@@ -119,6 +124,7 @@ class AudioSubtitleViewer {
             switch(e.key) {
                 case ' ':
                 case 'Spacebar':
+                    console.log('Space key pressed');
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
@@ -126,6 +132,7 @@ class AudioSubtitleViewer {
                     handled = true;
                     break;
                 case 'ArrowLeft':
+                    console.log('ArrowLeft key pressed');
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
@@ -133,6 +140,7 @@ class AudioSubtitleViewer {
                     handled = true;
                     break;
                 case 'ArrowRight':
+                    console.log('ArrowRight key pressed');
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
@@ -238,10 +246,23 @@ class AudioSubtitleViewer {
      * Skip backward 5 seconds
      */
     skipBackward() {
-        if (this.audioPlayer.readyState >= 2) { // HAVE_CURRENT_DATA or better
-            const newTime = Math.max(0, this.audioPlayer.currentTime - 5);
+        try {
+            if (!this.audioPlayer || !this.audioPlayer.src) {
+                console.warn('Audio player not ready');
+                return;
+            }
+            
+            const currentTime = this.audioPlayer.currentTime || 0;
+            const newTime = Math.max(0, currentTime - 5);
+            
+            console.log('Skip backward from', currentTime, 'to', newTime);
+            
+            // Mark this as an intentional seek
+            this.isIntentionalSeek = true;
             this.audioPlayer.currentTime = newTime;
-            console.log('Skip backward to:', newTime);
+        } catch (error) {
+            console.error('Error skipping backward:', error);
+            this.isIntentionalSeek = false;
         }
     }
     
@@ -249,11 +270,30 @@ class AudioSubtitleViewer {
      * Skip forward 5 seconds
      */
     skipForward() {
-        if (this.audioPlayer.readyState >= 2) { // HAVE_CURRENT_DATA or better
-            const duration = this.audioPlayer.duration || Infinity;
-            const newTime = Math.min(duration, this.audioPlayer.currentTime + 5);
+        try {
+            if (!this.audioPlayer || !this.audioPlayer.src) {
+                console.warn('Audio player not ready');
+                return;
+            }
+            
+            const currentTime = this.audioPlayer.currentTime || 0;
+            const duration = this.audioPlayer.duration;
+            
+            if (isNaN(duration) || !isFinite(duration)) {
+                console.warn('Duration not available');
+                return;
+            }
+            
+            const newTime = Math.min(duration, currentTime + 5);
+            
+            console.log('Skip forward from', currentTime, 'to', newTime);
+            
+            // Mark this as an intentional seek
+            this.isIntentionalSeek = true;
             this.audioPlayer.currentTime = newTime;
-            console.log('Skip forward to:', newTime);
+        } catch (error) {
+            console.error('Error skipping forward:', error);
+            this.isIntentionalSeek = false;
         }
     }
     
@@ -345,15 +385,69 @@ class AudioSubtitleViewer {
             this.subtitleDisplay.textContent = '';
         });
         
-        // Prevent audio player from handling arrow keys
+        // Completely prevent audio player from handling ANY keyboard events
         this.audioPlayer.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
-                e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
-                e.key === ' ' || e.key === 'Spacebar') {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        }, true);
+        
+        // Also prevent on keyup and keypress
+        this.audioPlayer.addEventListener('keyup', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        }, true);
+        
+        this.audioPlayer.addEventListener('keypress', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        }, true);
+        
+        // Remove focus from audio player when clicked
+        // But allow seeking via timeline click
+        this.audioPlayer.addEventListener('click', (e) => {
+            // Allow intentional seeking via timeline
+            this.isIntentionalSeek = true;
+            
+            setTimeout(() => {
+                this.audioPlayer.blur();
+                document.body.focus();
+            }, 0);
+        });
+        
+        // Also allow seeking via timeline drag
+        this.audioPlayer.addEventListener('mousedown', (e) => {
+            this.isIntentionalSeek = true;
+        });
+        
+        // Prevent audio player from receiving focus
+        this.audioPlayer.addEventListener('focus', (e) => {
+            e.preventDefault();
+            this.audioPlayer.blur();
+            document.body.focus();
+        });
+        
+        // Track if we're intentionally seeking (to prevent unwanted seeks)
+        this.isIntentionalSeek = false;
+        
+        // Prevent unwanted seeking (like when arrow keys trigger "next track")
+        this.audioPlayer.addEventListener('seeking', (e) => {
+            if (!this.isIntentionalSeek) {
+                console.warn('Unwanted seek detected, preventing...');
                 e.preventDefault();
                 e.stopPropagation();
             }
-        }, true);
+        });
+        
+        // Reset seek flag after seeking completes
+        this.audioPlayer.addEventListener('seeked', () => {
+            this.isIntentionalSeek = false;
+        });
         
         // Audio player error listener
         this.audioPlayer.addEventListener('error', (e) => {

@@ -305,17 +305,29 @@ body.dark-mode h1 {
 #audioPlayer {
     width: 100%;
     border-radius: 8px;
-    outline: none;
-    pointer-events: auto;
+    outline: none !important;
 }
 
-/* Prevent audio player from stealing focus and handling keyboard */
-#audioPlayer:focus {
-    outline: none;
-}
-
+/* Completely prevent audio player from receiving focus */
+#audioPlayer:focus,
+#audioPlayer:focus-within,
 #audioPlayer:focus-visible {
-    outline: none;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Disable pointer events on audio player controls to prevent focus */
+#audioPlayer::-webkit-media-controls-panel {
+    pointer-events: none;
+}
+
+#audioPlayer::-webkit-media-controls-play-button,
+#audioPlayer::-webkit-media-controls-timeline,
+#audioPlayer::-webkit-media-controls-current-time-display,
+#audioPlayer::-webkit-media-controls-time-remaining-display,
+#audioPlayer::-webkit-media-controls-mute-button,
+#audioPlayer::-webkit-media-controls-volume-slider {
+    pointer-events: auto;
 }
 
 /* Speed Control */
