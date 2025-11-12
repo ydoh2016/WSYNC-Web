@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Subtitle Viewer</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Dark Mode Toggle & Feedback Button -->
+    <div class="top-controls">
+        <button id="darkModeToggle" class="icon-btn" title="다크 모드 전환">
+            <span class="icon-sun">☀️</span>
+            <span class="icon-moon" style="display: none;">🌙</span>
+        </button>
+        <a href="https://github.com/YOUR-USERNAME/YOUR-REPO/issues/new?title=피드백:%20&labels=feedback" 
+           class="feedback-btn" 
+           target="_blank"
+           rel="noopener noreferrer"
+           title="GitHub에서 피드백 남기기">
+            💬 피드백
+        </a>
+    </div>
+    
+    <div class="container">
+        <h1>Audio Subtitle Viewer</h1>
+        
+        <!-- Attribution Notice (Required by AGPL-3.0) -->
+        <div class="attribution-notice">
+            <small>
+                Open source project by <a href="https://github.com/YOUR-USERNAME" target="_blank" rel="noopener">@YOUR-USERNAME</a> 
+                | <a href="https://github.com/YOUR-USERNAME/YOUR-REPO" target="_blank" rel="noopener">View Source</a>
+                | Licensed under AGPL-3.0
+            </small>
+        </div>
+        
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <div class="file-input-group">
+                <div class="file-input">
+                    <label for="audioFile">Audio File (WAV):</label>
+                    <input type="file" id="audioFile" accept=".wav" required>
+                    <span class="file-name" id="audioFileName">No file selected</span>
+                </div>
+                
+                <div class="file-input">
+                    <label for="subtitleFile">Subtitle File (VTT):</label>
+                    <input type="file" id="subtitleFile" accept=".vtt" required>
+                    <span class="file-name" id="subtitleFileName">No file selected</span>
+                </div>
+                
+                <div class="file-input">
+                    <label for="imageFile">Image File (Optional):</label>
+                    <input type="file" id="imageFile" accept=".jpg,.jpeg,.png,.gif,.webp">
+                    <span class="file-name" id="imageFileName">No file selected</span>
+                </div>
+            </div>
+            
+            <button id="uploadBtn" class="upload-btn">Upload Files</button>
+            <div id="uploadStatus" class="upload-status"></div>
+        </div>
+        
+        <!-- Player Section -->
+        <div class="player-section" id="playerSection" style="display: none;">
+            <div class="audio-controls">
+                <audio id="audioPlayer" controls></audio>
+                
+                <!-- Playback Speed Control -->
+                <div class="speed-control">
+                    <label for="speedControl">재생 속도:</label>
+                    <select id="speedControl" class="speed-select">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x (보통)</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                </div>
+                
+                <!-- Keyboard Shortcuts Info -->
+                <div class="shortcuts-info">
+                    <details>
+                        <summary>⌨️ 키보드 단축키</summary>
+                        <ul>
+                            <li><kbd>Space</kbd> - 재생/일시정지</li>
+                            <li><kbd>←</kbd> - 5초 뒤로</li>
+                            <li><kbd>→</kbd> - 5초 앞으로</li>
+                            <li><kbd>↑</kbd> - 볼륨 증가</li>
+                            <li><kbd>↓</kbd> - 볼륨 감소</li>
+                            <li><kbd>M</kbd> - 음소거 토글</li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
+            
+            <div class="content-display">
+                <div class="image-container" id="imageContainer" style="display: none;">
+                    <img id="imageDisplay" class="image-display" alt="Display image">
+                </div>
+                
+                <div class="subtitle-container">
+                    <div id="subtitleDisplay" class="subtitle-display">
+                        Subtitles will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>

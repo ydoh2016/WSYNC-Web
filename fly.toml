@@ -1,0 +1,39 @@
+# Fly.io deployment configuration
+# See https://fly.io/docs/reference/configuration/ for more information
+
+app = "audio-subtitle-viewer"
+primary_region = "sjc"  # Change to your preferred region (sjc=San Jose, iad=Virginia, lhr=London, etc.)
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  MAX_UPLOAD_SIZE = "2147483648"
+  UPLOAD_TIMEOUT = "300"
+  PORT = "8000"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512  # Increased for handling large files
+
+# Persistent storage for uploads (optional)
+# Uncomment to enable persistent storage
+# [[mounts]]
+#   source = "uploads_volume"
+#   destination = "/app/uploads"
