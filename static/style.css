@@ -306,10 +306,15 @@ body.dark-mode h1 {
     width: 100%;
     border-radius: 8px;
     outline: none;
+    pointer-events: auto;
 }
 
-/* Prevent audio player from stealing focus */
+/* Prevent audio player from stealing focus and handling keyboard */
 #audioPlayer:focus {
+    outline: none;
+}
+
+#audioPlayer:focus-visible {
     outline: none;
 }
 

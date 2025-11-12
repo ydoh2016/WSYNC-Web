@@ -66,11 +66,24 @@ When you press a keyboard shortcut, you'll see a small notification in the top-r
 
 **Problem:** Space bar scrolls the page instead of pausing
 
-**Solution:** This is fixed! Space bar now always controls playback when player is loaded.
+**Solution:** ✅ Fixed! Space bar now always controls playback when player is loaded.
 
 **Problem:** Arrow keys scroll the page
 
-**Solution:** This is fixed! Arrow keys now control playback/volume when player is loaded.
+**Solution:** ✅ Fixed! Arrow keys now control playback/volume when player is loaded.
+
+**Problem:** Left/Right arrow keys don't skip (Known Issue - FIXED!)
+
+**Solution:** ✅ Fixed! This was a conflict with HTML5 audio player's default keyboard handling. We now:
+- Prevent audio player from handling keyboard events
+- Use multiple event listeners with capture phase
+- Add `stopImmediatePropagation()` to prevent event bubbling
+- Set audio player `tabindex="-1"` to prevent focus
+
+If you still experience issues:
+1. Click anywhere outside the audio player controls
+2. Check browser console (F12) for "Skip backward/forward to:" messages
+3. Try refreshing the page
 
 ### Still Having Issues?
 

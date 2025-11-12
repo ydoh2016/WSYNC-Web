@@ -88,8 +88,8 @@ class AudioSubtitleViewer {
      * Initialize keyboard shortcuts
      */
     initializeKeyboardShortcuts() {
-        // Use window instead of document to catch all keyboard events
-        window.addEventListener('keydown', (e) => {
+        // Handler function
+        const handleKeyboard = (e) => {
             // Only handle shortcuts when player is visible and audio is loaded
             if (this.playerSection.style.display === 'none') return;
             if (!this.audioPlayer.src) return;
@@ -121,30 +121,35 @@ class AudioSubtitleViewer {
                 case 'Spacebar':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.togglePlayPause();
                     handled = true;
                     break;
                 case 'ArrowLeft':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.skipBackward();
                     handled = true;
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.skipForward();
                     handled = true;
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.increaseVolume();
                     handled = true;
                     break;
                 case 'ArrowDown':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.decreaseVolume();
                     handled = true;
                     break;
@@ -152,6 +157,7 @@ class AudioSubtitleViewer {
                 case 'M':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.toggleMute();
                     handled = true;
                     break;
@@ -159,6 +165,7 @@ class AudioSubtitleViewer {
                 case 'F':
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     this.toggleFullscreen();
                     handled = true;
                     break;
@@ -168,7 +175,15 @@ class AudioSubtitleViewer {
                 // Visual feedback
                 this.showKeyboardFeedback(e.key);
             }
-        }, true); // Use capture phase to catch events before they reach other elements
+        };
+        
+        // Add multiple listeners to ensure we catch the events
+        // Use capture phase to catch events before they reach other elements
+        window.addEventListener('keydown', handleKeyboard, true);
+        document.addEventListener('keydown', handleKeyboard, true);
+        
+        // Also add to player section specifically
+        this.playerSection.addEventListener('keydown', handleKeyboard, true);
     }
     
     /**
@@ -223,17 +238,23 @@ class AudioSubtitleViewer {
      * Skip backward 5 seconds
      */
     skipBackward() {
-        this.audioPlayer.currentTime = Math.max(0, this.audioPlayer.currentTime - 5);
+        if (this.audioPlayer.readyState >= 2) { // HAVE_CURRENT_DATA or better
+            const newTime = Math.max(0, this.audioPlayer.currentTime - 5);
+            this.audioPlayer.currentTime = newTime;
+            console.log('Skip backward to:', newTime);
+        }
     }
     
     /**
      * Skip forward 5 seconds
      */
     skipForward() {
-        this.audioPlayer.currentTime = Math.min(
-            this.audioPlayer.duration, 
-            this.audioPlayer.currentTime + 5
-        );
+        if (this.audioPlayer.readyState >= 2) { // HAVE_CURRENT_DATA or better
+            const duration = this.audioPlayer.duration || Infinity;
+            const newTime = Math.min(duration, this.audioPlayer.currentTime + 5);
+            this.audioPlayer.currentTime = newTime;
+            console.log('Skip forward to:', newTime);
+        }
     }
     
     /**
@@ -323,6 +344,16 @@ class AudioSubtitleViewer {
         this.audioPlayer.addEventListener('ended', () => {
             this.subtitleDisplay.textContent = '';
         });
+        
+        // Prevent audio player from handling arrow keys
+        this.audioPlayer.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
+                e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
+                e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
         
         // Audio player error listener
         this.audioPlayer.addEventListener('error', (e) => {
