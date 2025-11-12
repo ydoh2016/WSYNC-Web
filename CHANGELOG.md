@@ -5,6 +5,32 @@ All notable changes to W Sync will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-11-12
+
+### Added - UX Improvements 🎨
+
+#### User Experience
+- **Upload Progress Bar** - Real-time progress with speed and ETA display
+- **Fullscreen Subtitles** - Dedicated fullscreen mode for better subtitle reading
+  - Press `F` to enter fullscreen
+  - Press `ESC` or `F` to exit
+  - Larger font size in fullscreen mode
+- **Default Dark Mode** - App now starts in dark mode by default
+- **Improved Keyboard Shortcuts** - More reliable keyboard control
+  - Fixed: Shortcuts now only work when player is loaded
+  - Fixed: Shortcuts don't interfere with form inputs
+  - Added: Visual feedback for keyboard actions
+
+#### Technical Improvements
+- XMLHttpRequest for upload progress tracking
+- Better error handling for large file uploads
+- Responsive fullscreen design for mobile devices
+
+### Fixed
+- Keyboard shortcuts not working reliably
+- Shortcuts triggering when typing in input fields
+- Progress calculation for large files
+
 ## [1.0.0] - 2024-11-12
 
 ### Added - Initial Release 🎉
@@ -72,12 +98,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [2.0.0] - Future
 
+#### AI-Powered Features 🤖
+- [ ] **AI Subtitle Translation** - Automatic translation with content filtering
+- [ ] **Smart Sync Adjustment** - AI-assisted timing correction
+- [ ] **Content Analysis** - Automatic topic detection and tagging
+- [ ] **Speech Recognition** - Generate subtitles from audio
+
 #### Major Features
 - [ ] User accounts (optional)
 - [ ] Cloud storage integration
-- [ ] Subtitle translation (with content filtering)
 - [ ] Collaborative editing
 - [ ] API for third-party integrations
+- [ ] Premium features (ad-free, advanced AI)
 
 ---
 

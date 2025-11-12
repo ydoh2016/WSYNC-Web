@@ -60,6 +60,22 @@
             </div>
             
             <button id="uploadBtn" class="upload-btn">Upload Files</button>
+            
+            <!-- Upload Progress -->
+            <div id="uploadProgress" class="upload-progress" style="display: none;">
+                <div class="progress-info">
+                    <span id="progressText">Uploading...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <div class="progress-details">
+                    <span id="uploadSpeed">0 MB/s</span>
+                    <span id="uploadETA">Calculating...</span>
+                </div>
+            </div>
+            
             <div id="uploadStatus" class="upload-status"></div>
         </div>
         
@@ -92,6 +108,8 @@
                             <li><kbd>↑</kbd> - 볼륨 증가</li>
                             <li><kbd>↓</kbd> - 볼륨 감소</li>
                             <li><kbd>M</kbd> - 음소거 토글</li>
+                            <li><kbd>F</kbd> - 자막 전체화면</li>
+                            <li><kbd>ESC</kbd> - 전체화면 종료</li>
                         </ul>
                     </details>
                 </div>
@@ -102,7 +120,10 @@
                     <img id="imageDisplay" class="image-display" alt="Display image">
                 </div>
                 
-                <div class="subtitle-container">
+                <div class="subtitle-container" id="subtitleContainer">
+                    <button id="fullscreenBtn" class="fullscreen-btn" title="전체화면 (F)">
+                        <span class="fullscreen-icon">⛶</span>
+                    </button>
                     <div id="subtitleDisplay" class="subtitle-display">
                         Subtitles will appear here...
                     </div>

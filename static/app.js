@@ -21,12 +21,23 @@ class AudioSubtitleViewer {
         this.imageFileName = document.getElementById('imageFileName');
         this.darkModeToggle = document.getElementById('darkModeToggle');
         this.speedControl = document.getElementById('speedControl');
+        this.uploadProgress = document.getElementById('uploadProgress');
+        this.progressBar = document.getElementById('progressBar');
+        this.progressText = document.getElementById('progressText');
+        this.progressPercent = document.getElementById('progressPercent');
+        this.uploadSpeed = document.getElementById('uploadSpeed');
+        this.uploadETA = document.getElementById('uploadETA');
+        this.subtitleContainer = document.getElementById('subtitleContainer');
+        this.fullscreenBtn = document.getElementById('fullscreenBtn');
         
         // Application state
         this.subtitles = [];
         this.currentAudioFilename = null;
         this.currentSubtitleFilename = null;
         this.currentImageFilename = null;
+        this.uploadStartTime = null;
+        this.uploadedBytes = 0;
+        this.isFullscreen = false;
         
         // Initialize features
         this.initializeDarkMode();
@@ -35,10 +46,13 @@ class AudioSubtitleViewer {
     }
     
     /**
-     * Initialize dark mode from localStorage
+     * Initialize dark mode from localStorage (default: dark mode)
      */
     initializeDarkMode() {
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        // Default to dark mode if no preference is saved
+        const savedPreference = localStorage.getItem('darkMode');
+        const isDarkMode = savedPreference === null ? true : savedPreference === 'true';
+        
         if (isDarkMode) {
             document.body.classList.add('dark-mode');
             this.updateDarkModeIcon(true);
@@ -75,41 +89,74 @@ class AudioSubtitleViewer {
      */
     initializeKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-            // Only handle shortcuts when player is visible
+            // Only handle shortcuts when player is visible and audio is loaded
             if (this.playerSection.style.display === 'none') return;
+            if (!this.audioPlayer.src) return;
             
             // Don't handle shortcuts when typing in input fields
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.target.tagName === 'INPUT' || 
+                e.target.tagName === 'TEXTAREA' || 
+                e.target.tagName === 'SELECT') return;
+            
+            // Don't handle if any modifier key is pressed (Ctrl, Alt, Cmd)
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+            
+            let handled = false;
             
             switch(e.key) {
                 case ' ':
                 case 'Spacebar':
                     e.preventDefault();
                     this.togglePlayPause();
+                    handled = true;
                     break;
                 case 'ArrowLeft':
                     e.preventDefault();
                     this.skipBackward();
+                    handled = true;
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
                     this.skipForward();
+                    handled = true;
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
                     this.increaseVolume();
+                    handled = true;
                     break;
                 case 'ArrowDown':
                     e.preventDefault();
                     this.decreaseVolume();
+                    handled = true;
                     break;
                 case 'm':
                 case 'M':
                     e.preventDefault();
                     this.toggleMute();
+                    handled = true;
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    this.toggleFullscreen();
+                    handled = true;
                     break;
             }
+            
+            if (handled) {
+                // Visual feedback
+                this.showKeyboardFeedback(e.key);
+            }
         });
+    }
+    
+    /**
+     * Show visual feedback for keyboard shortcuts
+     */
+    showKeyboardFeedback(key) {
+        // Optional: Add visual feedback when keyboard shortcuts are used
+        // This helps users know their input was registered
     }
     
     /**
@@ -162,6 +209,23 @@ class AudioSubtitleViewer {
     }
     
     /**
+     * Toggle fullscreen mode for subtitles
+     */
+    toggleFullscreen() {
+        this.isFullscreen = !this.isFullscreen;
+        
+        if (this.isFullscreen) {
+            this.subtitleContainer.classList.add('fullscreen');
+            this.fullscreenBtn.innerHTML = '<span class="fullscreen-icon">✕</span>';
+            this.fullscreenBtn.title = '전체화면 종료 (F 또는 ESC)';
+        } else {
+            this.subtitleContainer.classList.remove('fullscreen');
+            this.fullscreenBtn.innerHTML = '<span class="fullscreen-icon">⛶</span>';
+            this.fullscreenBtn.title = '전체화면 (F)';
+        }
+    }
+    
+    /**
      * Set up event listeners for file upload and audio playback
      * Requirements: 1.3, 2.3, 3.1
      */
@@ -188,6 +252,16 @@ class AudioSubtitleViewer {
         // Speed control listener
         this.speedControl.addEventListener('change', (e) => {
             this.audioPlayer.playbackRate = parseFloat(e.target.value);
+        });
+        
+        // Fullscreen button listener
+        this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+        
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isFullscreen) {
+                this.toggleFullscreen();
+            }
         });
         
         // Audio player time update listener for subtitle synchronization
@@ -343,10 +417,136 @@ class AudioSubtitleViewer {
     }
     
     /**
-     * Upload audio file via fetch API
+     * Upload audio file via fetch API with progress tracking
      * Requirements: 1.1, 1.2
      */
     async uploadAudio(file) {
+        return this.uploadFileWithProgress(file, '/api/upload/audio', 'Audio');
+    }
+    
+    /**
+     * Generic file upload with progress tracking
+     */
+    async uploadFileWithProgress(file, endpoint, fileType) {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Show progress bar
+        this.uploadProgress.style.display = 'block';
+        this.progressText.textContent = `Uploading ${fileType}...`;
+        this.uploadStartTime = Date.now();
+        this.uploadedBytes = 0;
+        
+        try {
+            // Use XMLHttpRequest for progress tracking
+            const response = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        this.updateProgress(percentComplete, e.loaded, e.total);
+                    }
+                });
+                
+                xhr.addEventListener('load', () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve({
+                            ok: true,
+                            status: xhr.status,
+                            json: () => Promise.resolve(JSON.parse(xhr.responseText))
+                        });
+                    } else {
+                        resolve({
+                            ok: false,
+                            status: xhr.status,
+                            json: () => Promise.resolve(JSON.parse(xhr.responseText))
+                        });
+                    }
+                });
+                
+                xhr.addEventListener('error', () => {
+                    reject(new Error('Network error'));
+                });
+                
+                xhr.open('POST', endpoint);
+                xhr.send(formData);
+            });
+            
+            // Hide progress bar
+            this.uploadProgress.style.display = 'none';
+            
+            if (!response.ok) {
+                let errorMessage = `${fileType} upload failed`;
+                try {
+                    const error = await response.json();
+                    errorMessage = error.detail || errorMessage;
+                } catch (e) {
+                    if (response.status === 413) {
+                        errorMessage = `${fileType} file size too large`;
+                    } else if (response.status === 500) {
+                        errorMessage = 'Server error. Please try again later';
+                    } else {
+                        errorMessage = `${errorMessage} (${response.status})`;
+                    }
+                }
+                throw new Error(errorMessage);
+            }
+            
+            const data = await response.json();
+            
+            // Handle audio-specific logic
+            if (endpoint.includes('/audio')) {
+                this.currentAudioFilename = data.filename;
+                this.audioPlayer.src = `/api/files/audio/${data.filename}`;
+                this.audioPlayer.load();
+                
+                this.audioPlayer.onerror = () => {
+                    throw new Error('Failed to load audio file');
+                };
+            }
+            
+            return data;
+            
+        } catch (error) {
+            this.uploadProgress.style.display = 'none';
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                throw new Error('Cannot connect to server. Check your network connection');
+            }
+            throw error;
+        }
+    }
+    
+    /**
+     * Update progress bar
+     */
+    updateProgress(percent, loaded, total) {
+        // Update progress bar
+        this.progressBar.style.width = `${percent}%`;
+        this.progressPercent.textContent = `${Math.round(percent)}%`;
+        
+        // Calculate upload speed
+        const elapsed = (Date.now() - this.uploadStartTime) / 1000; // seconds
+        const speed = loaded / elapsed; // bytes per second
+        const speedMB = (speed / (1024 * 1024)).toFixed(2); // MB/s
+        this.uploadSpeed.textContent = `${speedMB} MB/s`;
+        
+        // Calculate ETA
+        const remaining = total - loaded;
+        const eta = remaining / speed; // seconds
+        if (eta < 60) {
+            this.uploadETA.textContent = `${Math.round(eta)}s remaining`;
+        } else {
+            const minutes = Math.floor(eta / 60);
+            const seconds = Math.round(eta % 60);
+            this.uploadETA.textContent = `${minutes}m ${seconds}s remaining`;
+        }
+    }
+    
+    /**
+     * Original upload audio (kept for compatibility, now uses progress version)
+     */
+    async _uploadAudioOld(file) {
         const formData = new FormData();
         formData.append('file', file);
         
@@ -395,10 +595,26 @@ class AudioSubtitleViewer {
     }
     
     /**
-     * Upload subtitle file via fetch API
+     * Upload subtitle file via fetch API with progress
      * Requirements: 2.1, 2.2
      */
     async uploadSubtitle(file) {
+        const data = await this.uploadFileWithProgress(file, '/api/upload/subtitle', 'Subtitle');
+        
+        this.currentSubtitleFilename = data.filename;
+        this.subtitles = data.cues;
+        
+        if (!this.subtitles || this.subtitles.length === 0) {
+            throw new Error('Subtitle file contains no valid subtitles');
+        }
+        
+        return data;
+    }
+    
+    /**
+     * Original upload subtitle (kept for reference)
+     */
+    async _uploadSubtitleOld(file) {
         const formData = new FormData();
         formData.append('file', file);
         
@@ -446,10 +662,28 @@ class AudioSubtitleViewer {
     }
     
     /**
-     * Upload optional image file via fetch API
+     * Upload optional image file via fetch API with progress
      * Requirements: 4.1, 4.3, 4.4, 4.5
      */
     async uploadImage(file) {
+        const data = await this.uploadFileWithProgress(file, '/api/upload/image', 'Image');
+        
+        this.currentImageFilename = data.filename;
+        this.imageDisplay.src = data.url;
+        this.imageContainer.style.display = 'flex';
+        
+        this.imageDisplay.onerror = () => {
+            this.imageContainer.style.display = 'none';
+            console.warn('Failed to load image');
+        };
+        
+        return data;
+    }
+    
+    /**
+     * Original upload image (kept for reference)
+     */
+    async _uploadImageOld(file) {
         const formData = new FormData();
         formData.append('file', file);
         

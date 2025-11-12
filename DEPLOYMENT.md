@@ -340,6 +340,125 @@ If you encounter CORS errors:
 2. Verify allowed origins
 3. Check browser console for specific errors
 
+## AWS Deployment
+
+### AWS Elastic Beanstalk
+
+1. **Install EB CLI**
+```bash
+pip install awsebcli
+```
+
+2. **Initialize EB Application**
+```bash
+eb init -p python-3.10 w-sync
+```
+
+3. **Create Environment**
+```bash
+eb create w-sync-prod
+```
+
+4. **Configure Environment Variables**
+```bash
+eb setenv MAX_UPLOAD_SIZE=2147483648 UPLOAD_TIMEOUT=300
+```
+
+5. **Deploy**
+```bash
+eb deploy
+```
+
+### AWS EC2 (Manual)
+
+1. **Launch EC2 Instance**
+   - AMI: Ubuntu 22.04 LTS
+   - Instance Type: t3.medium (or larger for production)
+   - Security Group: Allow ports 22 (SSH), 80 (HTTP), 443 (HTTPS)
+
+2. **Connect and Setup**
+```bash
+ssh -i your-key.pem ubuntu@your-ec2-ip
+
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Python and dependencies
+sudo apt install python3.10 python3-pip nginx -y
+
+# Clone repository
+git clone https://github.com/YOUR-USERNAME/w-sync.git
+cd w-sync
+
+# Install dependencies
+pip3 install -r requirements.txt
+
+# Setup systemd service
+sudo nano /etc/systemd/system/wsync.service
+```
+
+3. **Systemd Service File**
+```ini
+[Unit]
+Description=W Sync Application
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/w-sync
+Environment="PATH=/home/ubuntu/.local/bin"
+ExecStart=/home/ubuntu/.local/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+4. **Configure Nginx**
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    client_max_body_size 2G;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 300s;
+    }
+}
+```
+
+5. **Start Services**
+```bash
+sudo systemctl start wsync
+sudo systemctl enable wsync
+sudo systemctl restart nginx
+```
+
+### AWS Lambda + API Gateway (Serverless)
+
+For serverless deployment, use Mangum adapter:
+
+```bash
+pip install mangum
+```
+
+Update `main.py`:
+```python
+from mangum import Mangum
+
+# ... existing code ...
+
+handler = Mangum(app)
+```
+
+Deploy with AWS SAM or Serverless Framework.
+
+**Note:** Lambda has limitations for large file uploads. Consider using S3 pre-signed URLs for files > 10MB.
+
 ## Support
 
 For issues or questions:
@@ -347,3 +466,4 @@ For issues or questions:
 - Review error messages
 - Consult platform-specific documentation
 - Check GitHub issues
+- AWS-specific: Check CloudWatch logs

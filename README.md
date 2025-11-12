@@ -6,9 +6,11 @@
 
 A powerful, lightweight web application for synchronizing and playing WAV audio files with VTT subtitle files. Perfect for language learning, transcription work, and audio content creation.
 
+[![CI](https://github.com/YOUR-USERNAME/w-sync/workflows/CI/badge.svg)](https://github.com/YOUR-USERNAME/w-sync/actions)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![Tests](https://img.shields.io/badge/tests-25%20passed-success.svg)](tests/)
 
 ## Features
 
@@ -22,14 +24,18 @@ A powerful, lightweight web application for synchronizing and playing WAV audio 
 - 🐳 Docker support for easy deployment
 
 ### Enhanced Features ✨
-- **🌓 Dark Mode** - Toggle between light and dark themes (preference saved locally)
-- **⌨️ Keyboard Shortcuts** - Control playback efficiently
+- **🌓 Dark Mode** - Default dark theme with toggle (preference saved locally)
+- **⌨️ Keyboard Shortcuts** - Full keyboard control for efficient playback
   - `Space` - Play/Pause
   - `←` / `→` - Skip backward/forward 5 seconds
   - `↑` / `↓` - Volume up/down
   - `M` - Mute/Unmute
+  - `F` - Fullscreen subtitles
+  - `ESC` - Exit fullscreen
 - **⚡ Playback Speed Control** - Adjust speed from 0.5x to 2x (perfect for language learning!)
-- **💬 Feedback Button** - Send feedback directly to the developer
+- **📊 Upload Progress** - Real-time progress bar with speed and ETA
+- **🖥️ Fullscreen Subtitles** - Focus mode for better reading
+- **💬 Feedback Button** - Send feedback directly via GitHub
 - **🎯 Modern UI** - Beautiful gradient design with smooth transitions
 
 ## 🎬 Demo
@@ -108,7 +114,7 @@ Environment variables:
 - 🚀 **Fast & Lightweight** - No heavy frameworks, pure performance
 - 🌐 **Works Everywhere** - Just a web browser needed
 - 🎓 **Perfect for Learning** - Ideal for language learners and students
-- 🔒 **Privacy First** - All processing happens on your server
+- 🤖 **AI-Powered** - Smart features coming soon
 - 💰 **Free & Open Source** - AGPL-3.0 licensed
 
 ## Technology Stack
@@ -191,10 +197,16 @@ If you want to run this as a service without sharing your source code, you need 
 
 See [COPYING.md](COPYING.md) for detailed license information and examples.
 
-## Future Enhancements
+## Roadmap 🗺️
 
-- Translation feature for foreign language subtitles
+### Coming Soon
+- 🤖 **AI-Powered Translation** - Automatic subtitle translation with content filtering
+- 🎯 **Smart Subtitle Sync** - AI-assisted timing adjustment
+- 📊 **Usage Analytics** - Understand how you use W Sync
+
+### Future Plans
 - Multiple subtitle track support
 - Playlist functionality
-- User authentication
+- User accounts (optional)
 - Cloud storage integration
+- Mobile app

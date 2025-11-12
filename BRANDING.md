@@ -77,7 +77,8 @@ Secondary:
 2. **Keyboard Shortcuts** - Power user friendly
 3. **Speed Control** - Perfect for learning
 4. **Open Source** - Transparent and trustworthy
-5. **Privacy First** - No data collection
+5. **AI-Powered** - Smart features (coming soon)
+6. **Cloud-Based** - Access from anywhere
 
 ## Social Media
 
@@ -90,10 +91,10 @@ Secondary:
 - #WebApp
 
 ### Short Description (Twitter/X)
-"W Sync: Open-source web app for syncing WAV audio with VTT subtitles. Perfect for language learning! 🎵 #OpenSource #LanguageLearning"
+"W Sync: Cloud-based web app for syncing WAV audio with VTT subtitles. AI-powered features coming soon! 🎵🤖 #WebApp #LanguageLearning #AI"
 
 ### Long Description (GitHub/LinkedIn)
-"W Sync is a powerful, lightweight web application that synchronizes WAV audio files with VTT subtitles. Built with FastAPI and vanilla JavaScript, it offers features like dark mode, keyboard shortcuts, and playback speed control. Perfect for language learners, content creators, and transcriptionists. Open source under AGPL-3.0."
+"W Sync is a powerful, cloud-based web application that synchronizes WAV audio files with VTT subtitles. Built with FastAPI and vanilla JavaScript, it offers features like dark mode, keyboard shortcuts, and playback speed control. AI-powered translation and smart sync features coming soon. Perfect for language learners, content creators, and transcriptionists. Open source under AGPL-3.0."
 
 ## File Naming
 
@@ -121,8 +122,9 @@ Alternative emojis:
 | Dark Mode | ✅ Built-in | ⚠️ Rare |
 | Keyboard Shortcuts | ✅ Full support | ⚠️ Limited |
 | Speed Control | ✅ 0.5x - 2x | ⚠️ Limited range |
-| Privacy | ✅ Self-hosted | ❌ Cloud-based |
-| Cost | ✅ Free | 💰 Subscription |
+| AI Features | 🔜 Coming soon | ❌ None |
+| Cloud-Based | ✅ AWS hosted | ⚠️ Varies |
+| Cost | ✅ Free (ads) | 💰 Subscription |
 
 ## Brand Personality
 
@@ -135,11 +137,11 @@ If W Sync were a person:
 
 ## Don'ts
 
-- ❌ Don't claim AI features (we don't have any)
-- ❌ Don't promise features we don't have
+- ❌ Don't overpromise AI capabilities (be clear about "coming soon")
+- ❌ Don't promise features we don't have yet
 - ❌ Don't compare negatively to competitors
-- ❌ Don't use corporate jargon
-- ❌ Don't oversell - be honest about limitations
+- ❌ Don't use excessive corporate jargon
+- ❌ Don't oversell - be honest about current limitations
 
 ## Launch Messaging
 
@@ -160,13 +162,14 @@ Key features:
 - 🌓 Dark mode
 - ⌨️ Keyboard shortcuts
 - ⚡ Speed control (0.5x - 2x)
-- 🔒 Privacy-first (self-hosted)
-- 💰 100% free and open source
+- 🌐 Cloud-based (AWS hosted)
+- 🤖 AI features coming soon
+- 💰 Free with ads
 
 Try it now: [Your URL]
 GitHub: [Your Repo]
 
-#OpenSource #LanguageLearning #WebApp"
+#OpenSource #LanguageLearning #AI #WebApp"
 
 ## Future Branding Considerations
 
@@ -177,6 +180,9 @@ As the project grows, consider:
 - User testimonials
 - Case studies
 - Blog posts about use cases
+- AI feature announcements
+- Partnership opportunities (language learning platforms)
+- Premium tier branding (if applicable)
 
 ---
 
