@@ -6,10 +6,12 @@
 
 HTML5 `<audio>` elements have built-in keyboard controls that conflict with custom shortcuts:
 
-1. **Arrow Keys Behavior**
+1. **Arrow Keys Behavior (Chrome-specific)**
    - `←` / `→` are interpreted as "previous/next track" in a playlist
    - When no playlist exists, it seeks to 0:00 (beginning)
    - This overrides our custom 5-second skip functionality
+   - **Only occurs in Chrome/Chromium browsers**
+   - Safari, Firefox work fine without intervention
 
 2. **Focus Stealing**
    - When audio player receives focus (via click or Space key)
@@ -53,28 +55,34 @@ audioPlayer.addEventListener('focus', () => {
 });
 ```
 
-#### 3. Intentional Seek Tracking
+#### 3. Smart Seek Detection (Chrome Bug Fix)
 
 ```javascript
-// Track whether seek is intentional (our code) or unwanted (browser default)
-this.isIntentionalSeek = false;
-
-audioPlayer.addEventListener('seeking', (e) => {
-    if (!this.isIntentionalSeek) {
-        console.warn('Unwanted seek detected');
-        e.preventDefault();
-        e.stopPropagation();
+// Detect unwanted seeks to 0:00 (Chrome arrow key bug)
+audioPlayer.addEventListener('seeking', () => {
+    const seekTarget = this.audioPlayer.currentTime;
+    const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+    
+    // If seeking to 0:00 unexpectedly
+    if (seekTarget === 0 && !this.isIntentionalSeek && timeSinceLastSeek < 100) {
+        // Revert to previous position
+        this.audioPlayer.currentTime = this.lastKnownTime;
     }
 });
 
-// Set flag before our seeks
-skipForward() {
-    this.isIntentionalSeek = true;
-    this.audioPlayer.currentTime = newTime;
-}
+// Track current time to detect unwanted jumps
+audioPlayer.addEventListener('timeupdate', () => {
+    this.lastKnownTime = this.audioPlayer.currentTime;
+});
 ```
 
-This prevents the "jump to 0:00" issue when arrow keys are pressed.
+This prevents the "jump to 0:00" issue when arrow keys are pressed in Chrome.
+
+**Key Points:**
+- Only reverts seeks to 0:00 (the bug behavior)
+- Allows normal user seeks via mouse/timeline
+- Tracks last known position to restore
+- Time-based detection (< 100ms) to catch rapid seeks
 
 #### 4. Multiple Event Listeners
 
@@ -156,10 +164,12 @@ Open browser console and test:
 ### Browser Compatibility
 
 Tested and working on:
-- ✅ Chrome 120+
-- ✅ Firefox 121+
-- ✅ Safari 17+
-- ✅ Edge 120+
+- ✅ Chrome 120+ (requires special handling for arrow keys)
+- ✅ Firefox 121+ (works without special handling)
+- ✅ Safari 17+ (works without special handling)
+- ✅ Edge 120+ (Chromium-based, same as Chrome)
+
+**Note:** The arrow key issue is Chrome/Chromium-specific. Safari and Firefox don't have this problem.
 
 ### References
 

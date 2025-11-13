@@ -1,0 +1,14 @@
+# robots.txt for W Sync
+
+User-agent: *
+Allow: /
+Allow: /static/
+
+# Disallow upload directory (user files)
+Disallow: /api/files/
+
+# Sitemap
+Sitemap: https://wsync-web.onrender.com/sitemap.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1

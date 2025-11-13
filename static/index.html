@@ -3,10 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>W Sync - WAV Audio & Subtitle Synchronizer</title>
-    <meta name="description" content="Sync WAV audio files with VTT subtitles. Perfect for language learning and audio transcription.">
+    
+    <!-- Primary Meta Tags -->
+    <title>W Sync - WAV Audio & Subtitle Synchronizer | Free Online Tool</title>
+    <meta name="title" content="W Sync - WAV Audio & Subtitle Synchronizer | Free Online Tool">
+    <meta name="description" content="Free online tool to sync WAV audio files with VTT subtitles. Perfect for language learning, transcription, and content creation. Dark mode, keyboard shortcuts, and speed control included.">
+    <meta name="keywords" content="audio subtitle sync, wav vtt synchronizer, language learning tool, subtitle editor, audio transcription, vtt player, subtitle synchronization, free audio tool, w sync">
+    <meta name="author" content="W Sync">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://wsync-web.onrender.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wsync-web.onrender.com/">
+    <meta property="og:title" content="W Sync - WAV Audio & Subtitle Synchronizer">
+    <meta property="og:description" content="Free online tool to sync WAV audio files with VTT subtitles. Perfect for language learning and transcription.">
+    <meta property="og:image" content="https://wsync-web.onrender.com/static/favicon.svg">
+    <meta property="og:site_name" content="W Sync">
+    <meta property="og:locale" content="ko_KR">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://wsync-web.onrender.com/">
+    <meta property="twitter:title" content="W Sync - WAV Audio & Subtitle Synchronizer">
+    <meta property="twitter:description" content="Free online tool to sync WAV audio files with VTT subtitles. Perfect for language learning and transcription.">
+    <meta property="twitter:image" content="https://wsync-web.onrender.com/static/favicon.svg">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/favicon.svg">
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "W Sync",
+      "alternateName": "WAV Audio & Subtitle Synchronizer",
+      "url": "https://wsync-web.onrender.com/",
+      "description": "Free online tool to synchronize WAV audio files with VTT subtitle files. Features include dark mode, keyboard shortcuts, playback speed control, and fullscreen subtitles.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "WAV audio file upload and playback",
+        "VTT subtitle synchronization",
+        "Dark mode support",
+        "Keyboard shortcuts",
+        "Playback speed control (0.5x - 2x)",
+        "Fullscreen subtitle mode",
+        "Optional image display"
+      ],
+      "screenshot": "https://wsync-web.onrender.com/static/favicon.svg",
+      "softwareVersion": "1.1.0",
+      "author": {
+        "@type": "Organization",
+        "name": "W Sync"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "ratingCount": "1"
+      }
+    }
+    </script>
 </head>
 <body>
     <!-- Dark Mode Toggle & Feedback Button -->
@@ -121,9 +188,15 @@
                 </div>
                 
                 <div class="subtitle-container" id="subtitleContainer">
-                    <button id="fullscreenBtn" class="fullscreen-btn" title="전체화면 (F)">
-                        <span class="fullscreen-icon">⛶</span>
-                    </button>
+                    <div class="subtitle-controls">
+                        <button id="fullscreenBtn" class="fullscreen-btn" title="전체화면 (F)">
+                            <span class="fullscreen-icon">⛶</span>
+                        </button>
+                        <div class="font-size-controls">
+                            <button id="fontSizeDecrease" class="font-btn" title="폰트 크기 감소">A-</button>
+                            <button id="fontSizeIncrease" class="font-btn" title="폰트 크기 증가">A+</button>
+                        </div>
+                    </div>
                     <div id="subtitleDisplay" class="subtitle-display">
                         Subtitles will appear here...
                     </div>

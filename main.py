@@ -369,6 +369,24 @@ async def serve_frontend():
     return FileResponse(index_path)
 
 
+@app.get("/robots.txt")
+async def serve_robots():
+    """Serve robots.txt for SEO."""
+    robots_path = static_dir / "robots.txt"
+    if robots_path.exists():
+        return FileResponse(robots_path, media_type="text/plain")
+    raise HTTPException(status_code=404, detail="robots.txt not found")
+
+
+@app.get("/sitemap.xml")
+async def serve_sitemap():
+    """Serve sitemap.xml for SEO."""
+    sitemap_path = static_dir / "sitemap.xml"
+    if sitemap_path.exists():
+        return FileResponse(sitemap_path, media_type="application/xml")
+    raise HTTPException(status_code=404, detail="sitemap.xml not found")
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", "8000"))

@@ -29,6 +29,8 @@ class AudioSubtitleViewer {
         this.uploadETA = document.getElementById('uploadETA');
         this.subtitleContainer = document.getElementById('subtitleContainer');
         this.fullscreenBtn = document.getElementById('fullscreenBtn');
+        this.fontSizeIncrease = document.getElementById('fontSizeIncrease');
+        this.fontSizeDecrease = document.getElementById('fontSizeDecrease');
         
         // Application state
         this.subtitles = [];
@@ -38,6 +40,10 @@ class AudioSubtitleViewer {
         this.uploadStartTime = null;
         this.uploadedBytes = 0;
         this.isFullscreen = false;
+        
+        // Font size state (in rem)
+        this.fontSize = parseFloat(localStorage.getItem('subtitleFontSize')) || 1.5;
+        this.applyFontSize();
         
         // Initialize features
         this.initializeDarkMode();
@@ -322,6 +328,32 @@ class AudioSubtitleViewer {
      * Toggle fullscreen mode for subtitles
      */
     toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            // Enter fullscreen using Fullscreen API
+            this.subtitleContainer.requestFullscreen().then(() => {
+                this.isFullscreen = true;
+                this.subtitleContainer.classList.add('fullscreen');
+                this.fullscreenBtn.innerHTML = '<span class="fullscreen-icon">✕</span>';
+                this.fullscreenBtn.title = '전체화면 종료 (F 또는 ESC)';
+            }).catch(err => {
+                console.warn('Fullscreen API not supported, using fallback');
+                // Fallback to overlay mode
+                this.toggleFullscreenFallback();
+            });
+        } else {
+            // Exit fullscreen
+            document.exitFullscreen();
+            this.isFullscreen = false;
+            this.subtitleContainer.classList.remove('fullscreen');
+            this.fullscreenBtn.innerHTML = '<span class="fullscreen-icon">⛶</span>';
+            this.fullscreenBtn.title = '전체화면 (F)';
+        }
+    }
+    
+    /**
+     * Fallback fullscreen mode (overlay)
+     */
+    toggleFullscreenFallback() {
         this.isFullscreen = !this.isFullscreen;
         
         if (this.isFullscreen) {
@@ -333,6 +365,38 @@ class AudioSubtitleViewer {
             this.fullscreenBtn.innerHTML = '<span class="fullscreen-icon">⛶</span>';
             this.fullscreenBtn.title = '전체화면 (F)';
         }
+    }
+    
+    /**
+     * Increase subtitle font size
+     */
+    increaseFontSize() {
+        this.fontSize = Math.min(5, this.fontSize + 0.2); // Max 5rem
+        this.applyFontSize();
+        this.saveFontSize();
+    }
+    
+    /**
+     * Decrease subtitle font size
+     */
+    decreaseFontSize() {
+        this.fontSize = Math.max(0.8, this.fontSize - 0.2); // Min 0.8rem
+        this.applyFontSize();
+        this.saveFontSize();
+    }
+    
+    /**
+     * Apply font size to subtitle display
+     */
+    applyFontSize() {
+        this.subtitleDisplay.style.fontSize = `${this.fontSize}rem`;
+    }
+    
+    /**
+     * Save font size to localStorage
+     */
+    saveFontSize() {
+        localStorage.setItem('subtitleFontSize', this.fontSize);
     }
     
     /**
@@ -367,10 +431,24 @@ class AudioSubtitleViewer {
         // Fullscreen button listener
         this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
         
+        // Font size control listeners
+        this.fontSizeIncrease.addEventListener('click', () => this.increaseFontSize());
+        this.fontSizeDecrease.addEventListener('click', () => this.decreaseFontSize());
+        
         // ESC key to exit fullscreen
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isFullscreen) {
                 this.toggleFullscreen();
+            }
+        });
+        
+        // Listen for fullscreen changes (when user presses ESC or F11)
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && this.isFullscreen) {
+                this.isFullscreen = false;
+                this.subtitleContainer.classList.remove('fullscreen');
+                this.fullscreenBtn.innerHTML = '<span class="fullscreen-icon">⛶</span>';
+                this.fullscreenBtn.title = '전체화면 (F)';
             }
         });
         
@@ -385,12 +463,18 @@ class AudioSubtitleViewer {
             this.subtitleDisplay.textContent = '';
         });
         
+        // Detect Chrome (where the arrow key issue occurs)
+        this.isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        
         // Completely prevent audio player from handling ANY keyboard events
+        // This is mainly needed for Chrome
         this.audioPlayer.addEventListener('keydown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
+            if (this.isChrome || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
         }, true);
         
         // Also prevent on keyup and keypress
@@ -417,11 +501,26 @@ class AudioSubtitleViewer {
             setTimeout(() => {
                 this.audioPlayer.blur();
                 document.body.focus();
+                // Reset flag after a short delay
+                setTimeout(() => {
+                    this.isIntentionalSeek = false;
+                }, 100);
             }, 0);
         });
         
         // Also allow seeking via timeline drag
         this.audioPlayer.addEventListener('mousedown', (e) => {
+            this.isIntentionalSeek = true;
+        });
+        
+        this.audioPlayer.addEventListener('mouseup', (e) => {
+            setTimeout(() => {
+                this.isIntentionalSeek = false;
+            }, 100);
+        });
+        
+        // Allow seeking during drag
+        this.audioPlayer.addEventListener('input', (e) => {
             this.isIntentionalSeek = true;
         });
         
@@ -434,13 +533,34 @@ class AudioSubtitleViewer {
         
         // Track if we're intentionally seeking (to prevent unwanted seeks)
         this.isIntentionalSeek = false;
+        this.lastSeekTime = 0;
         
-        // Prevent unwanted seeking (like when arrow keys trigger "next track")
-        this.audioPlayer.addEventListener('seeking', (e) => {
-            if (!this.isIntentionalSeek) {
-                console.warn('Unwanted seek detected, preventing...');
-                e.preventDefault();
-                e.stopPropagation();
+        // Detect and prevent unwanted seeks to 0:00 (Chrome arrow key bug)
+        this.audioPlayer.addEventListener('seeking', () => {
+            const seekTarget = this.audioPlayer.currentTime;
+            const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+            
+            // If seeking to 0:00 and we didn't intend it, and it's been less than 100ms
+            // This is likely the Chrome arrow key bug
+            if (seekTarget === 0 && !this.isIntentionalSeek && timeSinceLastSeek < 100) {
+                console.warn('Detected unwanted seek to 0:00, reverting...');
+                // Revert to previous position
+                if (this.lastKnownTime && this.lastKnownTime > 0) {
+                    setTimeout(() => {
+                        this.isIntentionalSeek = true;
+                        this.audioPlayer.currentTime = this.lastKnownTime;
+                    }, 0);
+                }
+            }
+            
+            this.lastSeekTime = Date.now();
+        });
+        
+        // Track current time to detect unwanted jumps
+        this.lastKnownTime = 0;
+        this.audioPlayer.addEventListener('timeupdate', () => {
+            if (!this.audioPlayer.seeking) {
+                this.lastKnownTime = this.audioPlayer.currentTime;
             }
         });
         
